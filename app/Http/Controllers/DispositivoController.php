@@ -46,8 +46,9 @@ class DispositivoController extends Controller
             if($usuarioDispositivo->save()){
                 return $usuarioDispositivo->id;
             }
+            return $usuarioDispositivo->errors();
         }
-        return false;
+        return $dispositivo->errors();
     }
     
 }

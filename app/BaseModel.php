@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class BaseModel extends Model
 {
@@ -15,12 +16,14 @@ class BaseModel extends Model
     
     protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja'];
     
-    protected static $rules = array();
+    protected $rules = array();
 
     protected $errors;
 
-    public function validate($data)
+    public function save(array $options = [])
     {
+        $data = $this->getAttributes();
+
         // make a new validator object
         $v = Validator::make($data, $this->rules);
 
@@ -28,12 +31,12 @@ class BaseModel extends Model
         if ($v->fails())
         {
             // set errors and return false
-            $this->errors = $v->errors;
+            $this->errors = $v->errors();
             return false;
         }
 
         // validation pass
-        return true;
+        return parent::save($options);
     }
 
     public function errors()

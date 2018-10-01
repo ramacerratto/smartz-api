@@ -8,7 +8,6 @@ class Cultivo extends BaseModel
 {
 
     const CREATED_AT = 'fecha_inicio';
-    const UPDATED_AT = false;
     
     /**
      * The table associated with the model.
@@ -37,7 +36,7 @@ class Cultivo extends BaseModel
         'estado' => self::ACTIVO
     ];
 
-    public static $rules = [
+    public $rules = [
         'dispositivos_id' => 'required|exists:dispositivos,id',
         'rutinas_cultivo_id' => 'required|exists:rutinas_cultivo,id',
     ];

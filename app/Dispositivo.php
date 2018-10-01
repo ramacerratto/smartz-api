@@ -32,7 +32,7 @@ class Dispositivo extends BaseModel
         'estado' => parent::ACTIVO
     ];
 
-    public static $rules = [
+    public $rules = [
         'codigo' => 'required|unique:dispositivos',
         'descripcion' => 'required|alpha_dash|max:255'
     ];
@@ -50,7 +50,7 @@ class Dispositivo extends BaseModel
      */
     public function cultivos()
     {
-        return $this->hasMany('App\Cultivo');
+        return $this->hasMany('App\Cultivo','dispositivos_id');
     }
     
 }
