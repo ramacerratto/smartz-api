@@ -35,16 +35,20 @@ class CultivoController extends Controller
      * @param Request $request
      */
     public function crear(Request $request){
+        $this->validate($request, [
+           'dispositivos_id' => 'required' 
+        ]);
+        
         $datos = $request->all();
         
-        $dispositivo = \App\Dispositivo::find($datos['dispositivos_id']);
+        $dispositivo = \App\Dispositivo::findOrFail($datos['dispositivos_id']);
         
         $cultivo = new Cultivo($datos);
         
         if($dispositivo->cultivos()->save($cultivo)){
             return $cultivo->id;
         }
-        return false;
+        return $cultivo->errors();
     }
     
 }
