@@ -43,12 +43,19 @@ class Medicion extends Model
         'dispositivos_id' => 'required|exists:dispositivos,id',
         'rutinas_cultivo_id' => 'required|exists:rutinas_cultivo,id',
     ];
-
     /**
      * Obtiene la rutina de cultivo del cultivo
      */
     public function rutinaCultivo()
     {
         return $this->belongsTo('App\RutinaCultivo');
+    }
+
+    /**
+     * Obtiene el dispositivo del cultivo
+     */
+    public function dispositivo()
+    {
+        return $this->belongsTo('App\Dispositivo');
     }
 }

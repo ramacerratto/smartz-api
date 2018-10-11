@@ -36,14 +36,6 @@ class Dispositivo extends BaseModel
         'codigo' => 'required|unique:dispositivos',
         'descripcion' => 'required|alpha_dash|max:255'
     ];
-    
-    /**
-     * Obtiene los usuarios relacionados con el dispositivo.
-     
-    public function usuarios()
-    {
-        return $this->belongsToMany('App\Usuario', 'usuarios_dispositivos');
-    }*/
 
     /**
      * Obtiene los cultivos para el dispositivo.
@@ -51,6 +43,13 @@ class Dispositivo extends BaseModel
     public function cultivos()
     {
         return $this->hasMany('App\Cultivo','dispositivos_id');
+    }
+    
+    public function cultivoActual()
+    {
+        return self::with(['cultivos' => function ($query) {
+            $query->where('estado', parent::ACTIVO);
+        }])->get();
     }
     
 }

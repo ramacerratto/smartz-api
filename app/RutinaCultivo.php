@@ -37,4 +37,9 @@ class RutinaCultivo extends Model
             // Validation rules
     ];
     
+    public function fasesRutinaCultivo()
+    {
+        return $this->hasMany('App\FaseRutinaCultivo', 'rutinas_cultivo_id');
+    }
+    
 }

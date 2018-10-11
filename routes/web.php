@@ -21,6 +21,8 @@ $router->get('rutinas_cultivo', 'RutinaCultivoController@index');
 
 $router->get('cultivos/{idUsuario}', 'CultivoController@get');
 
+$router->get('mediciones/test', 'MedicionController@test');
+
 $router->post('cultivos/crear', 'CultivoController@crear');
 
 

@@ -46,6 +46,29 @@ class Cultivo extends BaseModel
      */
     public function rutinaCultivo()
     {
-        return $this->belongsTo('App\RutinaCultivo');
+        return $this->belongsTo('App\RutinaCultivo', 'rutinas_cultivo_id');
+    }
+    
+    /**
+     * Obtiene las mediciones del cultivo 
+     */
+    public function mediciones()
+    {
+        return $this->hasMany('App\Medicion');
+    }
+    
+    public function faseActual(){
+        $fechaInicio = new \DateTime($this->fecha_inicio);
+        $interval = $fechaInicio->diff(new \DateTime());
+        $dias = $interval->format('%a');
+        $rutinaCultivo = self::with(['rutinaCultivo.fasesRutinaCultivo.fase' => function ($query) {
+            $query->orderBy('orden', 'asc');
+        }])->get();
+        var_dump($rutinaCultivo);
+        var_dump($dias); 
+        foreach($rutinaCultivo->rutinaCultivo->fasesRutinaCultivo as $fase){
+            $duracion = $fase->duracion;
+            echo $duracion;
+        }die();
     }
 }
