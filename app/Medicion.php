@@ -7,10 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Medicion extends Model
 {
 
-    const CREATED_AT = 'fecha_inicio';
-    const UPDATED_AT = false;
-    
-    const ACTIVO = 1;
+    const CREATED_AT = 'fecha';
     
     /**
      * The table associated with the model.
@@ -43,19 +40,29 @@ class Medicion extends Model
         'dispositivos_id' => 'required|exists:dispositivos,id',
         'rutinas_cultivo_id' => 'required|exists:rutinas_cultivo,id',
     ];
+    
+    
     /**
-     * Obtiene la rutina de cultivo del cultivo
+     * Obtiene la FaseRutinaCultivo de la medicion
      */
-    public function rutinaCultivo()
+    public function faseRutinaCultivo()
     {
-        return $this->belongsTo('App\RutinaCultivo');
+        return $this->belongsTo('App\FaseRutinaCultivo');
     }
 
     /**
-     * Obtiene el dispositivo del cultivo
+     * Obtiene el cultivo de la medicion
      */
-    public function dispositivo()
+    public function cultivo()
     {
-        return $this->belongsTo('App\Dispositivo');
+        return $this->belongsTo('App\Cultivo');
+    }
+
+    /**
+     * Obtiene el parametro de la medición
+     */
+    public function parametro()
+    {
+        return $this->belongsTo('App\Parametro');
     }
 }

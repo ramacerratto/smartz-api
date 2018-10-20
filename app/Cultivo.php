@@ -57,18 +57,25 @@ class Cultivo extends BaseModel
         return $this->hasMany('App\Medicion');
     }
     
+    /**
+     * Devuelve la fase actual o false si el ciclo ya termino
+     * 
+     * @return boolean
+     */
     public function faseActual(){
         $fechaInicio = new \DateTime($this->fecha_inicio);
         $interval = $fechaInicio->diff(new \DateTime());
-        $dias = $interval->format('%a');
-        $rutinaCultivo = self::with(['rutinaCultivo.fasesRutinaCultivo.fase' => function ($query) {
+        $transcurrido = $interval->format('%a');
+        $rutinasCultivo = $this->belongsTo('App\RutinaCultivo', 'rutinas_cultivo_id')->with(['fasesRutinaCultivo.fase' => function ($query) {
             $query->orderBy('orden', 'asc');
-        }])->get();
-        var_dump($rutinaCultivo);
-        var_dump($dias); 
-        foreach($rutinaCultivo->rutinaCultivo->fasesRutinaCultivo as $fase){
-            $duracion = $fase->duracion;
-            echo $duracion;
-        }die();
+        }])->get()->first();
+        
+        foreach($rutinasCultivo->fasesRutinaCultivo as $fase){
+            $transcurrido -= $fase->duracion;
+            if($transcurrido <= 0){
+                return $fase->id;
+            }
+        }
+        return false;
     }
 }
