@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\BaseModel;
 
-class ParametroFaseCultivo extends Model
+class FaseRutinaCultivo extends BaseModel
 {
     
     /**
@@ -12,7 +12,7 @@ class ParametroFaseCultivo extends Model
      *
      * @var string
      */
-    protected $table = 'parametros_fase_cultivo';
+    protected $table = 'fases_rutina_cultivo';
     
     /**
      * The attributes that are mass assignable.
@@ -28,15 +28,8 @@ class ParametroFaseCultivo extends Model
      */
     protected $hidden = [];
     
-    protected $dates = [];
-    
-    public static $rules = [];
-
-    /**
-     * Obtiene la rutina de cultivo del cultivo
-     */
-    public function rutinaCultivo()
-    {
-        return $this->belongsTo('App\RutinaCultivo');
+    public function fase(){
+        return $this->belongsTo('App\Fase', 'fase_id');
     }
+    
 }

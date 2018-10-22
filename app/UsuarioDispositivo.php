@@ -32,7 +32,7 @@ class UsuarioDispositivo extends Model
     public static function findDispositivos($idUsuario)
     {
         $array = [];
-        $results = self::where('usuarios_id',$idUsuario)->with('dispositivo')->get();
+        $results = self::where('usuario_id',$idUsuario)->with('dispositivo')->get();
         foreach($results as $result){
             $array[] = $result->dispositivo;
         }
@@ -40,6 +40,6 @@ class UsuarioDispositivo extends Model
     }
     
     public function dispositivo(){
-        return $this->belongsTo('App\Dispositivo','dispositivos_id');
+        return $this->belongsTo('App\Dispositivo');
     }
 }

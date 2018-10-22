@@ -2,13 +2,8 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-
-class RutinaCultivo extends Model
+class RutinaCultivo extends BaseModel
 {
-    
-    const CREATED_AT = 'fecha_alta';
-    const UPDATED_AT = 'fecha_modificacion';
     
     /**
      * The table associated with the model.
@@ -31,10 +26,13 @@ class RutinaCultivo extends Model
      */
     protected $hidden = [];
     
-    protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja'];
-
     public static $rules = [
             // Validation rules
     ];
+    
+    public function fasesRutinaCultivo()
+    {
+        return $this->hasMany('App\FaseRutinaCultivo');
+    }
     
 }
