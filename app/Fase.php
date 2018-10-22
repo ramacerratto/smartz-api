@@ -2,9 +2,9 @@
 
 namespace App;
 
-use App\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class Fase extends BaseModel
+class Fase extends Model
 {
     
     /**

@@ -1,11 +1,4 @@
 <?php
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -26,8 +19,7 @@ class Parametro extends JsonResource{
     public function toArray($request)
     {
         return [
-            $this->parametro->descripcion . 'Min' => $this->valor_min,
-            $this->parametro->descripcion . 'Max' => $this->valor_max,
+            $this->descripcion  => $this->valor_esperado
         ];
     }
 }

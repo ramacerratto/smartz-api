@@ -2,17 +2,19 @@
 
 namespace App;
 
-use App\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class FaseRutinaCultivo extends BaseModel
+class TipoNotificacion extends Model
 {
+    const ALERTA = 0;
+    const ERROR = 1;
     
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'fases_rutina_cultivo';
+    protected $table = 'tipos_notificacion';
     
     /**
      * The attributes that are mass assignable.
@@ -27,9 +29,5 @@ class FaseRutinaCultivo extends BaseModel
      * @var array
      */
     protected $hidden = [];
-    
-    public function fase(){
-        return $this->belongsTo('App\Fase', 'fase_id');
-    }
     
 }

@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Medicion extends Model
 {
 
-    const CREATED_AT = 'fecha';
-    
     /**
      * The table associated with the model.
      *
@@ -21,7 +19,7 @@ class Medicion extends Model
      *
      * @var array
      */
-    protected $fillable = ['dispositivos_id', 'rutinas_cultivo_id'];
+    protected $fillable = ['valor'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -30,17 +28,12 @@ class Medicion extends Model
      */
     protected $hidden = [];
     
-    protected $dates = ['fecha_inicio'];
+    public $timestamps = false;
     
-    protected $attributes = [
-        'estado' => self::ACTIVO
-    ];
-
     public static $rules = [
-        'dispositivos_id' => 'required|exists:dispositivos,id',
-        'rutinas_cultivo_id' => 'required|exists:rutinas_cultivo,id',
+        'valor' => 'required|float',
+        'fecha' => 'required|date'
     ];
-    
     
     /**
      * Obtiene la FaseRutinaCultivo de la medicion

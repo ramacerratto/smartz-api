@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Cultivo;
 use Illuminate\Http\Request;
-use App\Http\Resources\Parametro as ParametroResource;
+use App\Cultivo;
+use App\Dispositivo;
+use App\Parametro;
+use App\Medicion;
 
 class MedicionController extends Controller
 {
@@ -23,38 +25,40 @@ class MedicionController extends Controller
      * @param Request $request
      */
     public function registrar(Request $request){
-        $this->validate($request, [
-           'chipID' => 'required|integer' 
-        ]);
         
         $datos = $request->all();
         $respuesta = [];
         
-        $dispositivo = \App\Dispositivo::where(['codigo' => $datos['chipID']])->first();
-        $cultivo = $dispositivo->cultivoActual;
-        $faseCultivo = $cultivo->faseActual;
+        //Obtengo datos maestros
+        $dispositivo = Dispositivo::where(['codigo' => $datos['chipID']])->firstOrFail();
+        $cultivo = $dispositivo->cultivoActual();
+        $faseCultivo = $cultivo->faseActual();
         
-        $respuesta['CantidadHorasLuz'] = $faseCultivo->horas_luz;
-        //$respuesta['HoraInicioLuz'] = obtener de conf;
+        //Armo array de respuesta:
+        $respuesta['id'] = $datos['chipID'];
+        $respuesta['HorasLuz'] = $faseCultivo->horas_luz;
+        $respuesta['HoraInicioLuz'] = $dispositivo->hora_inicio;
+        $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON)?1:0; //Envía estado del dispositivo (ON/OFF)
+        $respuesta['Vaciado'] = $dispositivo->vaciar();
         
         foreach($datos as $key => $dato){
-            $parametro = App\Parametro::whereDescripcion($key)->get()->first();
+            $parametro = Parametro::whereDescripcion($key)->get()->first();
             if($parametro){
                 $medicion = new Medicion();
-                $medicion->cultivo()->associate($cultivo);
                 $medicion->parametro()->associate($parametro);
                 $medicion->faseRutinaCultivo()->associate($faseCultivo);
                 $medicion->valor = $dato;
+                $medicion->fecha = new \DateTime;
                 
-                if(!$cultivo->mediciones()->save($medicion)){
-                    return $medicion->errors();
+                $cultivo->mediciones()->save($medicion);
+                
+                if($parametroFaseCultivo = $parametro->parametroFaseCultivo($faseCultivo)){
+                    $respuesta[$parametroFaseCultivo->descripcion] = $parametroFaseCultivo->valor_esperado;
                 }
-                $respuesta += new ParametroResource($parametro->parametroFaseCultivo($faseCultivo));
-                
             }
         }
         
-        return $respuesta;
+        return response()->json($respuesta, 200);
     }
     
     public function test(){

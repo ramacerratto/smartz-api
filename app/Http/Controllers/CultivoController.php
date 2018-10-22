@@ -25,8 +25,7 @@ class CultivoController extends Controller
      * @return array
      */
     public function get(Request $request, $idDispositivo){
-        
-        $dispositivo = \App\Dispositivo::find($idDispositivo);
+        $dispositivo = \App\Dispositivo::findOrFail($idDispositivo); //Esto responde con excepción (404)
         return $dispositivo->cultivos;
     }
 
@@ -35,20 +34,25 @@ class CultivoController extends Controller
      * @param Request $request
      */
     public function crear(Request $request){
-        $this->validate($request, [
-           'dispositivos_id' => 'required' 
-        ]);
+        $this->validate($request, Cultivo::$rules);
         
         $datos = $request->all();
         
-        $dispositivo = \App\Dispositivo::findOrFail($datos['dispositivos_id']);
+        $dispositivo = \App\Dispositivo::findOrFail($datos['dispositivo_id']);
+        
+        if($dispositivo->cultivoActual()){
+            return response()->json('El dispositivo ya tiene un cultivo activo.', 403);
+        }
         
         $cultivo = new Cultivo($datos);
         
-        if($dispositivo->cultivos()->save($cultivo)){
-            return $cultivo->id;
-        }
-        return $cultivo->errors();
+        $dispositivo->cultivos()->save($cultivo);
+                
+        $dispositivo->estado = \App\Dispositivo::ON; //"Prendo" el dispositivo
+        $dispositivo->save();
+        return response()->json($cultivo, 201);
     }
+    
+    //TODO: Finalizar CULTIVO
     
 }

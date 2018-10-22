@@ -47,6 +47,6 @@ class Parametro extends Model
      */
     public function parametroFaseCultivo($fase)
     {
-        return $this->hasMany('App\ParametroFaseCultivo')->where('fases_rutina_cultivo_id', $fase->id)->get()->first();
+        return $this->hasMany('App\ParametroFaseCultivo', 'parametro_id')->where(['fase_rutina_cultivo_id' => $fase->id])->first();
     }
 }

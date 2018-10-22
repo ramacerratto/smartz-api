@@ -21,7 +21,7 @@ class Cultivo extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['dispositivos_id', 'rutinas_cultivo_id'];
+    protected $fillable = ['dispositivo_id', 'rutina_cultivo_id'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -36,17 +36,17 @@ class Cultivo extends BaseModel
         'estado' => self::ACTIVO
     ];
 
-    public $rules = [
-        'dispositivos_id' => 'required|exists:dispositivos,id',
-        'rutinas_cultivo_id' => 'required|exists:rutinas_cultivo,id',
+    public static $rules = [
+        'dispositivo_id' => 'required|exists:dispositivos,id',
+        'rutina_cultivo_id' => 'required|exists:rutinas_cultivo,id',
     ];
-
+    
     /**
      * Obtiene la rutina de cultivo del cultivo
      */
     public function rutinaCultivo()
     {
-        return $this->belongsTo('App\RutinaCultivo', 'rutinas_cultivo_id');
+        return $this->belongsTo('App\RutinaCultivo', 'rutina_cultivo_id');
     }
     
     /**
@@ -66,14 +66,14 @@ class Cultivo extends BaseModel
         $fechaInicio = new \DateTime($this->fecha_inicio);
         $interval = $fechaInicio->diff(new \DateTime());
         $transcurrido = $interval->format('%a');
-        $rutinasCultivo = $this->belongsTo('App\RutinaCultivo', 'rutinas_cultivo_id')->with(['fasesRutinaCultivo.fase' => function ($query) {
+        $rutinasCultivo = $this->belongsTo('App\RutinaCultivo','rutina_cultivo_id')->with(['fasesRutinaCultivo.fase' => function ($query) {
             $query->orderBy('orden', 'asc');
-        }])->get()->first();
+        }])->first();
         
         foreach($rutinasCultivo->fasesRutinaCultivo as $fase){
             $transcurrido -= $fase->duracion;
             if($transcurrido <= 0){
-                return $fase->id;
+                return $fase;
             }
         }
         return false;
