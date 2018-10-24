@@ -26,12 +26,16 @@ $router->get( 'cultivos/{idUsuario}', 'CultivoController@get');
 $router->post('cultivos/crear',       'CultivoController@crear');
 
 //Dispositivos
-$router->get( 'dispositivos/{idUsuario}',    'DispositivoController@index');
-$router->get( 'dispositivos/get/{id}',       'DispositivoController@get');
-$router->post('dispositivos/crear',          'DispositivoController@crear');
-$router->put( 'dispositivos/guardarAjustes/{id}', 'DispositivoController@guardarAjustes');
-$router->put( 'dispositivos/trigger/{id}',   'DispositivoController@trigger');
-$router->put( 'dispositivos/vaciar/{id}',    'DispositivoController@vaciar');
+$router->get( 'dispositivos/{idUsuario}',  'DispositivoController@index');
+$router->get( 'dispositivos/get/{id}',     'DispositivoController@get');
+$router->post('dispositivos/crear',        'DispositivoController@crear');
+$router->put( 'dispositivos/editar/{id}',  'DispositivoController@editar');
+$router->put( 'dispositivos/trigger/{id}', 'DispositivoController@trigger');
+$router->put( 'dispositivos/vaciar/{id}',  'DispositivoController@vaciar');
+
+//Notificaciones
+$router->get( 'notificaciones/get/{id}', 'NotificacionController@get');
+
 
 //Comunicacion Arduino
 $router->post('comunicacionArduino', function(Request $request) use ($router) {

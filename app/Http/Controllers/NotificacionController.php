@@ -8,6 +8,12 @@ use App\Notificacion;
 
 class NotificacionController extends Controller
 {
+    
+    public function get(Request $request, $id){
+        $dispositivo = \App\Dispositivo::findOrFail($id);
+        return response()->json($dispositivo->notificaciones,200);
+    }
+    
     /**
      * 
      * @param Request $request
