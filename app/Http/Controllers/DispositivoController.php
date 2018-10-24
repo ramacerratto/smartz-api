@@ -43,7 +43,7 @@ class DispositivoController extends Controller
         $dispositivo->save();
         
         $usuarioDispositivo = new \App\UsuarioDispositivo();
-        $usuarioDispositivo->usuarios_id = $datos['usuario_id'];
+        $usuarioDispositivo->usuario_id = $datos['usuario_id'];
         $usuarioDispositivo->dispositivo()->associate($dispositivo);
         $usuarioDispositivo->save();
 
@@ -51,19 +51,22 @@ class DispositivoController extends Controller
     }
     
     public function get(Request $request, $id){
-        return \App\Dispositivo::where('id',$id)->with(['cultivos' => function ($query){
+        $dispositivo = Dispositivo::where('id',$id)->with(['cultivos' => function ($query){
             $query->where('estado', \App\Cultivo::ACTIVO);
         }])->first();
+        return response()->json($dispositivo, 200);
     }
     
-    public function guardarAjustes(Request $request, $id) {
+    public function editar(Request $request, $id) {
         $this->validate($request, [
-            'hora_inicio' => 'required|date_format:H:i'
+            'hora_inicio' => 'required|date_format:H:i',
+            'on' => 'required|boolean'
         ]);
         
         $dispositivo = Dispositivo::findOrFail($id);
         
         $dispositivo->hora_inicio = $request->input('hora_inicio');
+        $dispositivo->estado = ($request->input('on'))?Dispositivo::ON:Dispositivo::OFF;
         $dispositivo->save();
         
         return response()->json($dispositivo, 200);

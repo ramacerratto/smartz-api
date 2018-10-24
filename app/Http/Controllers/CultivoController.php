@@ -25,8 +25,8 @@ class CultivoController extends Controller
      * @return array
      */
     public function get(Request $request, $idDispositivo){
-        $dispositivo = \App\Dispositivo::findOrFail($idDispositivo); //Esto responde con excepción (404)
-        return $dispositivo->cultivos;
+        $dispositivo = \App\Dispositivo::findOrFail($idDispositivo)->with(['cultivos.rutinaCultivo'])->first(); //Esto responde con excepción (404)
+        return response()->json($dispositivo->cultivos,200);
     }
 
     /**

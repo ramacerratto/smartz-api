@@ -41,6 +41,22 @@ class Cultivo extends BaseModel
         'rutina_cultivo_id' => 'required|exists:rutinas_cultivo,id',
     ];
     
+    public function getFechaFinAttribute(){
+        $rutinasCultivo = $this->belongsTo('App\RutinaCultivo','rutina_cultivo_id')->with(['fasesRutinaCultivo.fase' => function ($query) {
+            $query->orderBy('orden', 'asc');
+        }])->first();
+        
+        $duracionTotal = 0;
+        foreach($rutinasCultivo->fasesRutinaCultivo as $fase){
+            $duracionTotal += $fase->duracion;
+        }
+        
+        $fechaInicio = new \DateTime($this->fecha_inicio);
+        $fechaInicio->add(new DateInterval("P{$duracionTotal}D")); // P1D means a period of 1 day
+        
+        return $fechaInicio->format('Y-m-d');
+    }
+    
     /**
      * Obtiene la rutina de cultivo del cultivo
      */
