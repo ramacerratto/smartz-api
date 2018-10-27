@@ -25,7 +25,11 @@ class CultivoController extends Controller
      * @return array
      */
     public function get(Request $request, $idDispositivo){
-        $dispositivo = \App\Dispositivo::findOrFail($idDispositivo)->with(['cultivos.rutinaCultivo'])->first(); //Esto responde con excepción (404)
+        $dispositivo = \App\Dispositivo::with(['cultivos' => function($query){
+            $query->where('estado', Cultivo::ACTIVO)->with(['rutinaCultivo' => function($query){
+                $query->select('id','nombre');
+            }]);
+        }])->findOrFail($idDispositivo); //Esto responde con excepción (404)
         return response()->json($dispositivo->cultivos,200);
     }
 
@@ -53,6 +57,18 @@ class CultivoController extends Controller
         return response()->json($cultivo, 201);
     }
     
-    //TODO: Finalizar CULTIVO
+    public function editar(Request $request, $id) {
+        $this->validate($request, [
+            'estado' => 'boolean',
+        ]);
+        
+        $datos = $request->all();
+        
+        $cultivo = Cultivo::findOrFail($id);
+        
+        $cultivo->update($datos);
+        
+        return response()->json($cultivo, 200);
+    }
     
 }

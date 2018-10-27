@@ -21,7 +21,14 @@ class Cultivo extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['dispositivo_id', 'rutina_cultivo_id'];
+    protected $fillable = ['dispositivo_id', 'rutina_cultivo_id', 'estado'];
+    
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['fecha_fin','dias_progreso','dias_totales','nombre_rutina_cultivo'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -30,7 +37,7 @@ class Cultivo extends BaseModel
      */
     protected $hidden = [];
     
-    protected $dates = ['fecha_inicio'];
+    protected $dates = ['fecha_inicio', 'fecha_modificacion'];
     
     protected $attributes = [
         'estado' => self::ACTIVO
@@ -52,9 +59,25 @@ class Cultivo extends BaseModel
         }
         
         $fechaInicio = new \DateTime($this->fecha_inicio);
-        $fechaInicio->add(new DateInterval("P{$duracionTotal}D")); // P1D means a period of 1 day
+        $fechaInicio->add(new \DateInterval("P{$duracionTotal}D")); // P1D means a period of 1 day
         
         return $fechaInicio->format('Y-m-d');
+    }
+    
+    public function getDiasProgresoAttribute(){
+        $fechaInicio = new \DateTime($this->fecha_inicio);
+        $interval = $fechaInicio->diff(new \DateTime());
+        return $interval->format('%a');
+    }
+    
+    public function getDiasTotalesAttribute(){
+        $fechaInicio = new \DateTime($this->fecha_inicio);
+        $interval = $fechaInicio->diff(new \DateTime($this->fecha_fin));
+        return $interval->format('%a');
+    }
+    
+    public function getNombreRutinaCultivoAttribute(){
+        return optional($this->rutinaCultivo)->nombre;
     }
     
     /**
@@ -86,12 +109,12 @@ class Cultivo extends BaseModel
             $query->orderBy('orden', 'asc');
         }])->first();
         
-        foreach($rutinasCultivo->fasesRutinaCultivo as $fase){
+        foreach($rutinasCultivo->fasesRutinaCultivo as &$fase){
             $transcurrido -= $fase->duracion;
             if($transcurrido <= 0){
-                return $fase;
+                break;
             }
         }
-        return false;
+        return $fase;
     }
 }

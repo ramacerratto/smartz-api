@@ -26,6 +26,13 @@ class RutinaCultivo extends BaseModel
      */
     protected $hidden = [];
     
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['dias_totales'];
+    
     public static $rules = [
             // Validation rules
     ];
@@ -35,4 +42,11 @@ class RutinaCultivo extends BaseModel
         return $this->hasMany('App\FaseRutinaCultivo');
     }
     
+    public function getDiasTotalesAttribute(){
+        $diasTotales = 0;
+        foreach($this->fasesRutinaCultivo as $fase){
+            $diasTotales += $fase->duracion;
+        }
+        return $diasTotales;
+    }
 }

@@ -17,6 +17,6 @@ class RutinaCultivoController extends Controller
     }
 
     public function index(){
-        return response()->json(RutinaCultivo::all(),200);
+        return response()->json(['rutinas_cultivo' => RutinaCultivo::all()],200);
     }
 }

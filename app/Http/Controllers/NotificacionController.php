@@ -10,8 +10,8 @@ class NotificacionController extends Controller
 {
     
     public function get(Request $request, $id){
-        $dispositivo = \App\Dispositivo::findOrFail($id);
-        return response()->json($dispositivo->notificaciones,200);
+        $dispositivo = \App\Dispositivo::with('notificaciones.tipoNotificacion')->findOrFail($id);
+        return response()->json(['notificaciones' => $dispositivo->notificaciones->take(10)],200);
     }
     
     /**

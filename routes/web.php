@@ -19,11 +19,12 @@ $router->get('/', function () use ($router) {
 });
 
 //Rutinas Cultivo
-$router->get('rutinas_cultivo', 'RutinaCultivoController@index');
+$router->get('rutinas_cultivo/get', 'RutinaCultivoController@index');
 
 //Cultivos
 $router->get( 'cultivos/{idUsuario}', 'CultivoController@get');
 $router->post('cultivos/crear',       'CultivoController@crear');
+$router->put( 'cultivos/editar/{id}', 'CultivoController@editar');
 
 //Dispositivos
 $router->get( 'dispositivos/{idUsuario}',  'DispositivoController@index');
@@ -36,11 +37,10 @@ $router->put( 'dispositivos/vaciar/{id}',  'DispositivoController@vaciar');
 //Notificaciones
 $router->get( 'notificaciones/get/{id}', 'NotificacionController@get');
 
-
 //Comunicacion Arduino
 $router->post('comunicacionArduino', function(Request $request) use ($router) {
     $this->validate($request, [
-        'chipID' => 'required|integer' 
+        'chipID' => 'required|alpha_num'
     ]);
     
     (new NotificacionController)->registrar($request);
@@ -50,4 +50,6 @@ $router->post('comunicacionArduino', function(Request $request) use ($router) {
 
 //Testing
 $router->get('mediciones/test', 'MedicionController@test');
+
+$router->get('mediciones/get/{id}', 'MedicionController@get');
     

@@ -24,6 +24,20 @@ class MedicionController extends Controller
      * 
      * @param Request $request
      */
+    public function get(Request $request, $id){
+        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id')->with([
+            'parametro' => function ($query){
+                $query->select('id','nombre');
+            }
+        ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
+        
+        return response()->json($mediciones->keyBy('parametro.nombre')->all(),200);
+    }
+    
+    /**
+     * 
+     * @param Request $request
+     */
     public function registrar(Request $request){
         
         $datos = $request->all();
@@ -31,7 +45,9 @@ class MedicionController extends Controller
         
         //Obtengo datos maestros
         $dispositivo = Dispositivo::where(['codigo' => $datos['chipID']])->firstOrFail();
-        $cultivo = $dispositivo->cultivoActual();
+        if(!$cultivo = $dispositivo->cultivoActual()){
+            return response()->json('No hay cultivo activo', 403);
+        }
         $faseCultivo = $cultivo->faseActual();
         
         //Armo array de respuesta:
@@ -58,11 +74,19 @@ class MedicionController extends Controller
             }
         }
         
+        //TODO: Pasar cultivo "en cosecha"
+        
         return response()->json($respuesta, 200);
     }
     
+    public function reporte(Request $request,$idCultivo,$idParametro){
+        //TODO: REPORTE DE LINEA
+        
+        
+    }
+    
     public function test(){
-        $cultivo = Cultivo::find(1);
+        $cultivo = Cultivo::find(2);
         
         return $cultivo->faseActual();
     }
