@@ -56,6 +56,6 @@ class Medicion extends Model
      */
     public function parametro()
     {
-        return $this->belongsTo('App\Parametro');
+        return $this->belongsTo('App\Parametro', 'parametro_id');
     }
 }

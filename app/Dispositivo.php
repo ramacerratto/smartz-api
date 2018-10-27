@@ -6,9 +6,12 @@ use App\BaseModel;
 
 class Dispositivo extends BaseModel
 {
-
-    const ON = 1;
-    const OFF = 0;
+    const OFF      = 0;
+    const ON       = 1;
+    const VACIANDO = 2;
+    const LLENANDO = 3;
+    const SIN_CONEXION = 4;
+    
     /**
      * The table associated with the model.
      *
@@ -21,7 +24,15 @@ class Dispositivo extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['codigo', 'descripcion', 'hora_inicio'];
+    protected $fillable = [
+        'codigo', 
+        'descripcion', 
+        'hora_inicio', 
+        'notificaciones_on', 
+        'luz_on', 
+        'vaciar',
+        'estado'
+    ];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -39,8 +50,8 @@ class Dispositivo extends BaseModel
     public static $rules = [
         'codigo' => 'required|unique:dispositivos',
         'descripcion' => 'required|alpha_dash|max:255',
-        'hora_inicio' => 'date_format:"H:i"',
-        'usuario_id' => 'required|alpha'
+        'hora_inicio' => 'date_format:"H"',
+        'usuario_id' => 'required|alpha_num'
     ];
 
     /**
@@ -61,7 +72,7 @@ class Dispositivo extends BaseModel
     }
     
     public function notificaciones(){
-        return $this->hasMany('App\Notificacion');
+        return $this->hasMany('App\Notificacion')->orderBy('fecha_alta','DESC');
     }
     
     /**
@@ -79,6 +90,7 @@ class Dispositivo extends BaseModel
         if($this->vaciar == 1 || $transcurrido >= config('app.vaciado.dias') ){
             $this->fecha_vaciado = new \DateTime();
             $this->save();
+            //TODO: Mandar notificación de que empieza vaciado.
             return 1;
         }
         return 0;

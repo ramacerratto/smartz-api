@@ -59,15 +59,17 @@ class DispositivoController extends Controller
     
     public function editar(Request $request, $id) {
         $this->validate($request, [
-            'hora_inicio' => 'required|date_format:H:i',
-            'on' => 'required|boolean'
+            'hora_inicio' => 'date_format:H',
+            'notificaciones_on' => 'boolean',
+            'luz_on' => 'boolean',
+            'vaciar' => 'boolean'
         ]);
+        
+        $datos = $request->all();
         
         $dispositivo = Dispositivo::findOrFail($id);
         
-        $dispositivo->hora_inicio = $request->input('hora_inicio');
-        $dispositivo->estado = ($request->input('on'))?Dispositivo::ON:Dispositivo::OFF;
-        $dispositivo->save();
+        $dispositivo->update($datos);
         
         return response()->json($dispositivo, 200);
     }
