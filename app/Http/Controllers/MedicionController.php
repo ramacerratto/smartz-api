@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Cultivo;
 use App\Dispositivo;
 use App\Parametro;
@@ -79,13 +80,30 @@ class MedicionController extends Controller
         return response()->json($respuesta, 200);
     }
     
-    public function reporte(Request $request,$idCultivo,$idParametro){
-        //TODO: REPORTE DE LINEA
-        /*
-         * Array labels
-         * Array Valores
-         */
+    /**
+     * Reporte lineal de mediciones en el tiempo
+     * 
+     * @param Request $request
+     * @param int $idCultivo
+     * @param int $idParametro
+     * @return array [labels, valores]
+     */
+    public function reporte(Request $request,$idCultivo,$idParametro,$tiempo = null){
+        $tiempo = ($tiempo)?$tiempo:1;
+        $hoy = new \DateTime();
+        $fechaLimite = $hoy->sub(new \DateInterval("P{$tiempo}W"))->format('Y-m-d H:i:s');
+        $mediciones = Medicion::where(['cultivo_id' => $idCultivo, 'parametro_id' => $idParametro,['fecha','>=',$fechaLimite] ])
+                ->select('fecha','valor')
+                ->selectRaw('dayofyear(fecha) Day, date_format(fecha,"%d/%m/%Y") as fecha_sh')
+                ->groupBy('Day')
+                ->orderBy('fecha','desc')
+                ->get();
         
+        $result = [
+            $mediciones->pluck('fecha_sh'),
+            $mediciones->pluck('valor'),
+        ];
+        return $result;
     }
     
     public function test(){

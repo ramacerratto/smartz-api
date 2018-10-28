@@ -3,6 +3,7 @@
 namespace App;
 
 use App\BaseModel;
+use Illuminate\Support\Carbon;
 
 class Dispositivo extends BaseModel
 {
@@ -53,10 +54,6 @@ class Dispositivo extends BaseModel
         'hora_inicio' => 'date_format:"H"',
         'usuario_id' => 'required|alpha_num'
     ];
-    
-    public function getHoraInicioAttribute(){
-        return $this->hora_inicio->format('H');
-    }
 
     /**
      * Obtiene los cultivos para el dispositivo.
@@ -91,7 +88,7 @@ class Dispositivo extends BaseModel
         $interval = $fechaVaciado->diff(new \DateTime());
         $transcurrido = $interval->format('%a');
         
-        if($this->vaciar == 1 || $transcurrido >= config('app.vaciado.dias') ){
+        if($this->vaciar == 1 || $transcurrido >= config('config.vaciado.dias') ){
             $this->fecha_vaciado = new \DateTime();
             $this->save();
             //TODO: Mandar notificación de que empieza vaciado.

@@ -21,6 +21,9 @@ $router->get('/', function () use ($router) {
 //Rutinas Cultivo
 $router->get('rutinas_cultivo/get', 'RutinaCultivoController@index');
 
+//Parametreos
+$router->get('parametros/get', 'ParametroController@index');
+
 //Cultivos
 $router->get( 'cultivos/{idUsuario}', 'CultivoController@get');
 $router->post('cultivos/crear',       'CultivoController@crear');
@@ -48,8 +51,10 @@ $router->post('comunicacionArduino', function(Request $request) use ($router) {
     return (new MedicionController)->registrar($request);
 });
 
+//Mediciones
+$router->get('mediciones/get/{id}', 'MedicionController@get');
+$router->get('mediciones/reporte/{idCultivo}/{idParametro}/{tiempo}', 'MedicionController@reporte');
+
 //Testing
 $router->get('mediciones/test', 'MedicionController@test');
-
-$router->get('mediciones/get/{id}', 'MedicionController@get');
     
