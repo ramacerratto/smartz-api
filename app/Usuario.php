@@ -1,0 +1,39 @@
+<?php
+
+namespace App;
+
+use App\BaseModel;
+
+class Usuario extends BaseModel
+{
+    
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'usuarios';
+    
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = ['codigo', 'device_token'];
+
+    /**
+     * The attributes excluded from the model's JSON form.
+     *
+     * @var array
+     */
+    protected $hidden = [];
+    
+    public static $rules = [
+        'codigo' => 'required|alpha_num',
+        'device_token' => 'required|alpha_num',
+    ];
+    
+    public function dispositivos(){
+        $this->belongsToMany('App\Dispositivo', 'usuarios_dispositivos');
+    }
+}

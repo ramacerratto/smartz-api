@@ -72,6 +72,10 @@ class Dispositivo extends BaseModel
         return $this->hasMany('App\UsuarioDispositivo');
     }
     
+    public function usuarios(){
+        return $this->belongsToMany('App\Usuario', 'usuarios_dispositivos');
+    }
+    
     public function notificaciones(){
         return $this->hasMany('App\Notificacion')->orderBy('fecha_alta','DESC');
     }
