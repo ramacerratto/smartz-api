@@ -53,6 +53,10 @@ class Dispositivo extends BaseModel
         'hora_inicio' => 'date_format:"H"',
         'usuario_id' => 'required|alpha_num'
     ];
+    
+    public function getHoraInicioAttribute(){
+        return $this->hora_inicio->format('H');
+    }
 
     /**
      * Obtiene los cultivos para el dispositivo.

@@ -81,7 +81,10 @@ class MedicionController extends Controller
     
     public function reporte(Request $request,$idCultivo,$idParametro){
         //TODO: REPORTE DE LINEA
-        
+        /*
+         * Array labels
+         * Array Valores
+         */
         
     }
     
