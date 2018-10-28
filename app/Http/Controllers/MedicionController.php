@@ -31,7 +31,7 @@ class MedicionController extends Controller
             }
         ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
         
-        return response()->json($mediciones->keyBy('parametro.nombre')->all(),200);
+        return response()->json(['mediciones' => $mediciones->keyBy('parametro.nombre')->all()],200);
     }
     
     /**
