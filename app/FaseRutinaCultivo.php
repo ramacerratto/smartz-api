@@ -2,9 +2,9 @@
 
 namespace App;
 
-use App\BaseModel;
+use Illuminate\Database\Eloquent\Model;
 
-class FaseRutinaCultivo extends BaseModel
+class FaseRutinaCultivo extends Model
 {
     
     /**
@@ -19,7 +19,7 @@ class FaseRutinaCultivo extends BaseModel
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['duracion', 'horas_luz', 'fase_id'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -28,8 +28,24 @@ class FaseRutinaCultivo extends BaseModel
      */
     protected $hidden = [];
     
+    public $timestamps = false;
+    
+    public static $rules = [
+        'duracion' => 'required|numeric|between:1,300',
+        'horas_luz' => 'required|numeric|between:0,24',
+        'fase_id' => 'exists:fases,id'
+    ];
+    
+    public function rutinaCultivo(){
+        return $this->belongsTo('App\RutinaCultivo');
+    }
+    
     public function fase(){
         return $this->belongsTo('App\Fase', 'fase_id');
+    }
+    
+    public function parametrosFaseCultivo(){
+        return $this->hasMany('App\ParametroFaseCultivo');
     }
     
 }
