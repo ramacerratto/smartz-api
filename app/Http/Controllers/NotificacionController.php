@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\TipoNotificacion;
 use App\Notificacion;
+use App\Servicio\Notificaciones;
 
 class NotificacionController extends Controller
 {
+    
+    /**
+     * Notificaciones service.
+     *
+     * @var Notificaciones
+     */
+    private $notificaciones;
+    
+    public function __construct(Notificaciones $notificaciones) {
+        $this->notificaciones = $notificaciones;
+    }
     
     public function get(Request $request, $id){
         $dispositivo = \App\Dispositivo::with('notificaciones.tipoNotificacion')->findOrFail($id);
@@ -41,20 +53,11 @@ class NotificacionController extends Controller
                     $notificacion->tipoNotificacion()->associate($tipoNotificacion);
                     $dispositivo->notificaciones()->save($notificacion);
                     
-                    $this->enviar($notificacion);
+                    $this->notificaciones->enviar($notificacion);
                 }
             }
         }
-        
-    }
-    
-    public function enviar($notificacion){
-        //TODO: Enviar notif a Firebase
-        
-        $notificacion->estado = \App\Notificacion::ENVIADA;
-        $notificacion->save();
-        
         return true;
-    }
+    }  
     
 }
