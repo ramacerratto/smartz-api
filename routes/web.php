@@ -19,7 +19,8 @@ $router->get('/', function () use ($router) {
 });
 
 //Rutinas Cultivo
-$router->get('rutinas_cultivo/get', 'RutinaCultivoController@index');
+$router->get('rutinas_cultivo/get[/{idUsuario}]', 'RutinaCultivoController@index');
+$router->post('rutinas_cultivo/crear', 'RutinaCultivoController@crear');
 
 //Parametreos
 $router->get('parametros/get', 'ParametroController@index');

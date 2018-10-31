@@ -101,4 +101,14 @@ class Dispositivo extends BaseModel
         return 0;
     }
     
+    public static function evaluarConexion(){
+        $horasDesconexion = 5;
+        $fecha = new \DateTime();
+        $fecha->sub(new \DateInterval("P{$horasDesconexion}I")); 
+        
+        $dispositivos = Dispositivo::hasWith(['App\Medicion' => function ($query) use ($fecha){
+            $query->selectRaw('max(fecha) as ult_fecha')->where('ult_fecha' <= $fecha->format('Y-m-d H:i:s'));
+        }])->update(['estado' => Dispositivo::SIN_CONEXION]);
+    }
+    
 }

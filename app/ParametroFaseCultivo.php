@@ -19,7 +19,7 @@ class ParametroFaseCultivo extends Model
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['valor_esperado', 'descripcion', 'parametro_id'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -30,8 +30,14 @@ class ParametroFaseCultivo extends Model
     
     protected $dates = [];
     
-    public static $rules = [];
+    public static $rules = [
+        'valor_esperado' => 'required|float',
+        'descripcion' => 'required', //-> es el nombre que se le devuelve al arduino (pHaceptable)
+        'parametro_id' => 'exists:parametros,id' 
+    ];
 
+    public $timestamps = false;
+    
     /**
      * Obtiene la rutina de cultivo del cultivo
      */

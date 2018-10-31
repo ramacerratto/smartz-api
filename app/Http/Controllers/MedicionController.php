@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use App\Cultivo;
 use App\Dispositivo;
 use App\Parametro;
@@ -76,6 +75,7 @@ class MedicionController extends Controller
         }
         
         //TODO: Pasar cultivo "en cosecha"
+        //TODO: Notificar
         
         return response()->json($respuesta, 200);
     }

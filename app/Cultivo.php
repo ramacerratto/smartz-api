@@ -9,6 +9,8 @@ class Cultivo extends BaseModel
 
     const CREATED_AT = 'fecha_inicio';
     
+    const COSECHABLE = 2;
+    
     /**
      * The table associated with the model.
      *
