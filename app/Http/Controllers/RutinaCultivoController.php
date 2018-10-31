@@ -17,8 +17,10 @@ class RutinaCultivoController extends Controller
         //
     }
 
-    public function index(){
-        return response()->json(['rutinas_cultivo' => RutinaCultivo::all()],200);
+    public function index($idUsuario = null){
+        $rutinasCultivo = RutinaCultivo::where('usuario_id',$idUsuario)->orWhereNull('usuario_id')->get();
+        
+        return response()->json(['rutinas_cultivo' => $rutinasCultivo ],200);
     }
     
     /**
@@ -26,11 +28,11 @@ class RutinaCultivoController extends Controller
      * @param Request $request
      */
     public function crear(Request $request){
-        //$this->validate($request, RutinaCultivo::$rules);
+        $this->validate($request, RutinaCultivo::$rules);
         
-        //$datos = $request->all();
+        $datos = $request->all();
         
-        $datos = [
+        /*$datos = [
             'nombre' => 'Nueva Rutina',
             'descripcion' => 'Nueva rutina',
             'fasesRutinaCultivo' => [
@@ -59,11 +61,14 @@ class RutinaCultivoController extends Controller
                     ]
                 ],
             ]
-        ];
+        ];*/
+        
+        $usuario = Usuario::where('codigo',$datos['codigo_usuario'])->firstOrFail();
         
         $rutinaCultivo = new RutinaCultivo($datos);
         
-        $rutinaCultivo->save();
+        $usuario->rutinasCultivo()->save($rutinaCultivo);
+        
         foreach ($datos['fasesRutinaCultivo'] as $datosFaseRutinaCultivo){
             //TODO: Faltan validaciones $this->validate($request, \App\FaseRutinaCultivo::$rules);
             //Creo las fasesRutinaCultivo

@@ -39,12 +39,18 @@ class RutinaCultivo extends BaseModel
     
     public static $rules = [
         'nombre' => 'required|alpha',
-        'descripcion' => 'required'
+        'descripcion' => 'required',
+        'codigo_usuario' => 'required'
     ];
     
     public function fasesRutinaCultivo()
     {
         return $this->hasMany('App\FaseRutinaCultivo', 'rutina_cultivo_id');
+    }
+    
+    public function usuario()
+    {
+        return $this->belongsTo('App\Usuario', 'usuario_id');
     }
     
     public function getDiasTotalesAttribute(){
