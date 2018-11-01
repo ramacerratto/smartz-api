@@ -72,6 +72,10 @@ class Dispositivo extends BaseModel
         return $this->hasMany('App\UsuarioDispositivo');
     }
     
+    public function usuarios(){
+        return $this->belongsToMany('App\Usuario', 'usuarios_dispositivos');
+    }
+    
     public function notificaciones(){
         return $this->hasMany('App\Notificacion')->orderBy('fecha_alta','DESC');
     }
@@ -97,14 +101,16 @@ class Dispositivo extends BaseModel
         return 0;
     }
     
-    public static function evaluarConexion(){
-        $horasDesconexion = 5;
+    public static function setDesconexiones(){
+        $minDesconexion = config('config.notificacion.desconexion');
         $fecha = new \DateTime();
-        $fecha->sub(new \DateInterval("P{$horasDesconexion}I")); 
+        $fecha->sub(new \DateInterval("P{$minDesconexion}I")); 
         
         $dispositivos = Dispositivo::hasWith(['App\Medicion' => function ($query) use ($fecha){
             $query->selectRaw('max(fecha) as ult_fecha')->where('ult_fecha' <= $fecha->format('Y-m-d H:i:s'));
         }])->update(['estado' => Dispositivo::SIN_CONEXION]);
+        
+        return $dispositivos;
     }
     
 }
