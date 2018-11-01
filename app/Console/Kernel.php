@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('conexion:evaluar')->hourly();
+        $m = config('config.notificacion.desconexion');
+        $schedule->command('conexion:evaluar')->cron("*/$m * * * *");
     }
 }

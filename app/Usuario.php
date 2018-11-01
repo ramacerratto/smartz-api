@@ -34,6 +34,10 @@ class Usuario extends BaseModel
     ];
     
     public function dispositivos(){
-        $this->belongsToMany('App\Dispositivo', 'usuarios_dispositivos');
+        return $this->belongsToMany('App\Dispositivo', 'usuarios_dispositivos');
+    }
+    
+    public function rutinasCultivo(){
+        return $this->hasMany('App\RutinaCultivo');
     }
 }

@@ -52,7 +52,7 @@ class evaluarConexion extends Command
      */
     public function handle()
     {
-        $dispositivos = \App\Dispositivo::evaluarConexion();
+        $dispositivos = \App\Dispositivo::setDesconexiones();
         foreach($dispositivos as $dispositivo){
             $tipoNotificacion = TipoNotificacion::where([
                 'tipo' => \App\TipoNotificacion::ERROR,
@@ -61,7 +61,7 @@ class evaluarConexion extends Command
             $notificacion = new Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $dispositivo->notificaciones()->save($notificacion);
-            $this->notificaciones->enviar($notificacion);
+            //$this->notificaciones->enviar($notificacion);
         }
     }
 }

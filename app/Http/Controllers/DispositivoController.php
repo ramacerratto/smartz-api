@@ -23,12 +23,12 @@ class DispositivoController extends Controller
      * @param Request $request
      * @param int $idUsuario
      * @return array
-     */
+     
     public function index(Request $request, $idUsuario){
         $dispositivos = \App\UsuarioDispositivo::findDispositivos($idUsuario);
         return response()->json($dispositivos, 200);
-    }
-    
+    }*/
+
     /**
      * Obtiene los dispositivos de un usuario
      * 
@@ -36,8 +36,8 @@ class DispositivoController extends Controller
      * @param int $idUsuario
      * @return array
      */
-    public function index2(Request $request, $idUsuario){
-        $usuario = \App\Usuario::where(['codigo' => $idUsuario])->with('dispositivos')->get();
+    public function index(Request $request, $codUsuario){
+        $usuario = \App\Usuario::where('codigo',$codUsuario)->with('dispositivos')->first();
         return response()->json($usuario->dispositivos, 200);
     }
 
@@ -52,14 +52,7 @@ class DispositivoController extends Controller
         
         $dispositivo = new Dispositivo($datos);
         
-        /*$dispositivo->save();
-        
-        $usuarioDispositivo = new \App\UsuarioDispositivo();
-        $usuarioDispositivo->usuario_id = $datos['usuario_id'];
-        $usuarioDispositivo->dispositivo()->associate($dispositivo);
-        $usuarioDispositivo->save();*/
-        
-        $usuario = \App\Usuario::findOrFail($datos['usuario_id']);
+        $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']]);
         
         $usuario->dispositivos()->save($dispositivo);
 
