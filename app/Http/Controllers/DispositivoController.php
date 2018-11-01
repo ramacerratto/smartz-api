@@ -50,7 +50,7 @@ class DispositivoController extends Controller
         
         $datos = $request->all();
         
-        $dispositivo = new Dispositivo($datos);
+        $dispositivo = Dispositivo::firstOrNew(['codigo' => $datos['codigo']],$datos);
         
         $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']]);
         

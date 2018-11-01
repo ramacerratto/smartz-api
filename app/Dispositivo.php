@@ -49,7 +49,7 @@ class Dispositivo extends BaseModel
     protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado'];
 
     public static $rules = [
-        'codigo' => 'required|unique:dispositivos',
+        'codigo' => 'required',
         'descripcion' => 'required|alpha_dash|max:255',
         'hora_inicio' => 'date_format:"H"',
         'usuario_id' => 'required|alpha_num'
