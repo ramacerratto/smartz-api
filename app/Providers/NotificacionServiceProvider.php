@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Servicios\Notificaciones;
 
 class NotificacionServiceProvider extends ServiceProvider
 {
@@ -12,8 +13,8 @@ class NotificacionServiceProvider extends ServiceProvider
      * @return void
      */
     public function register(){
-        $this->app->bind('App\Servicios\Notificacion', function ($app) {
-            return new Notificacion();
+        $this->app->bind(Notificaciones::class, function ($app) {
+            return new Notificaciones();
         });
     }
     

@@ -1,5 +1,5 @@
 <?php
-namespace App\Servicio;
+namespace App\Servicios;
 
 /**
  * Servicio para envio de notificaciones
@@ -24,7 +24,7 @@ class Notificaciones {
         ];
     }
     
-    public function enviarNotificacion($notificacion){
+    public function enviar($notificacion){
         $this->contenido['notification']['title'] = $notificacion->tipoNotificacion->titulo;
         $this->contenido['notification']['body'] = $notificacion->tipoNotificacion->mensaje;
         $this->contenido['registration_ids'] = \App\Usuario::with('dispositivos')

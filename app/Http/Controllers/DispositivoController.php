@@ -50,11 +50,11 @@ class DispositivoController extends Controller
         
         $datos = $request->all();
         
-        $dispositivo = Dispositivo::firstOrNew(['codigo' => $datos['codigo']],$datos);
+        $dispositivo = Dispositivo::firstOrCreate(['codigo' => $datos['codigo']],$datos);
         
         $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']]);
         
-        $usuario->dispositivos()->save($dispositivo);
+        $usuario->dispositivos()->syncWithoutDetaching($dispositivo);
 
         return response()->json($dispositivo, 201);
     }

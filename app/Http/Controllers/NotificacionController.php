@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\TipoNotificacion;
 use App\Notificacion;
-use App\Servicio\Notificaciones;
+use App\Servicios\Notificaciones;
 
 class NotificacionController extends Controller
 {
@@ -53,7 +53,7 @@ class NotificacionController extends Controller
                     $notificacion->tipoNotificacion()->associate($tipoNotificacion);
                     $dispositivo->notificaciones()->save($notificacion);
                     
-                    $this->notificaciones->enviar($notificacion);
+                    //$this->notificaciones->enviar($notificacion);
                 }
             }
         }

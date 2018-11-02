@@ -19,16 +19,16 @@ $router->get('/', function () use ($router) {
 });
 
 //Rutinas Cultivo
-$router->get('rutinas_cultivo/get[/{codUsuario}]', 'RutinaCultivoController@index');
+$router->get( 'rutinas_cultivo/get[/{codUsuario}]', 'RutinaCultivoController@index');
 $router->post('rutinas_cultivo/crear', 'RutinaCultivoController@crear');
 
 //Parametreos
 $router->get('parametros/get', 'ParametroController@index');
 
 //Cultivos
-$router->get( 'cultivos/{idUsuario}', 'CultivoController@get');
-$router->post('cultivos/crear',       'CultivoController@crear');
-$router->put( 'cultivos/editar/{id}', 'CultivoController@editar');
+$router->get( 'cultivos/{idDispositivo}', 'CultivoController@get');
+$router->post('cultivos/crear',           'CultivoController@crear');
+$router->put( 'cultivos/editar/{id}',     'CultivoController@editar');
 
 //Dispositivos
 $router->get( 'dispositivos/{codUsuario}', 'DispositivoController@index');
