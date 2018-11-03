@@ -2,6 +2,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Servicios\Notificaciones;
 
 
 /**
@@ -9,7 +10,7 @@ use Illuminate\Console\Command;
  *
  * @author RAMA
  */
-class evaluarConexion extends Command
+class EvaluarConexionCommand extends Command
 {
     /**
      * The name and signature of the console command.
@@ -26,16 +27,16 @@ class evaluarConexion extends Command
     protected $description = 'Evalúo los estados de conexión de los dispositivos';
 
     /**
-     * The drip e-mail service.
+     * The Notificaciones service.
      *
-     * @var DripEmailer
+     * @var Notificaciones
      */
-    protected $drip;
+    protected $notificaciones;
 
     /**
      * Create a new command instance.
      *
-     * @param  DripEmailer  $drip
+     * @param  Notificaciones $notificaciones
      * @return void
      */
     public function __construct(Notificaciones $notificaciones)
@@ -54,11 +55,11 @@ class evaluarConexion extends Command
     {
         $dispositivos = \App\Dispositivo::setDesconexiones();
         foreach($dispositivos as $dispositivo){
-            $tipoNotificacion = TipoNotificacion::where([
+            $tipoNotificacion = \App\TipoNotificacion::where([
                 'tipo' => \App\TipoNotificacion::ERROR,
                 'pos_string' => \App\TipoNotificacion::SINCONEXION
             ])->firstOrFail();
-            $notificacion = new Notificacion();
+            $notificacion = new \App\Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $dispositivo->notificaciones()->save($notificacion);
             //$this->notificaciones->enviar($notificacion);

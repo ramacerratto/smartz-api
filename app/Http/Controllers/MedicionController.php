@@ -28,7 +28,8 @@ class MedicionController extends Controller
         $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id')->with([
             'parametro' => function ($query){
                 $query->select('id','nombre');
-            }
+            },
+            'fasesRutinaCultivo.parametrosFaseCultivo'
         ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
         
         return response()->json(['mediciones' => $mediciones->keyBy('parametro.nombre')->all()],200);
@@ -54,8 +55,11 @@ class MedicionController extends Controller
         $respuesta['id'] = $datos['chipID'];
         $respuesta['HorasLuz'] = $faseCultivo->horas_luz;
         $respuesta['HoraInicioLuz'] = $dispositivo->hora_inicio;
-        $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON)?1:0; //Envía estado del dispositivo (ON/OFF)
+        $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON || $dispositivo->estado == Dispositivo::SIN_CONEXION)?1:0; //Envía estado del dispositivo (ON/OFF)
         $respuesta['Vaciado'] = $dispositivo->vaciar();
+        
+        $dispositivo->estado = $respuesta['Power'];
+        $dispositivo->save();
         
         foreach($datos as $key => $dato){
             $parametro = Parametro::whereDescripcion($key)->get()->first();
@@ -73,9 +77,6 @@ class MedicionController extends Controller
                 }
             }
         }
-        
-        //TODO: Pasar cultivo "en cosecha"
-        //TODO: Notificar
         
         return response()->json($respuesta, 200);
     }

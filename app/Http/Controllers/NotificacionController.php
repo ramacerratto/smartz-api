@@ -15,10 +15,11 @@ class NotificacionController extends Controller
      *
      * @var Notificaciones
      */
-    private $notificaciones;
+    protected $notificaciones;
     
-    public function __construct(Notificaciones $notificaciones) {
-        $this->notificaciones = $notificaciones;
+    public function __construct() {
+        
+        //$this->notificaciones = $notificaciones;
     }
     
     public function get(Request $request, $id){

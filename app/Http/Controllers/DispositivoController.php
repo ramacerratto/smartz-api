@@ -16,18 +16,6 @@ class DispositivoController extends Controller
     {
         //
     }
-    
-    /**
-     * Obtiene los dispositivos de un usuario
-     * 
-     * @param Request $request
-     * @param int $idUsuario
-     * @return array
-     
-    public function index(Request $request, $idUsuario){
-        $dispositivos = \App\UsuarioDispositivo::findDispositivos($idUsuario);
-        return response()->json($dispositivos, 200);
-    }*/
 
     /**
      * Obtiene los dispositivos de un usuario
@@ -37,8 +25,10 @@ class DispositivoController extends Controller
      * @return array
      */
     public function index(Request $request, $codUsuario){
-        $usuario = \App\Usuario::where('codigo',$codUsuario)->with('dispositivos')->first();
-        return response()->json($usuario->dispositivos, 200);
+        $dispositivos = Dispositivo::whereHas('usuarios', function($query) use ($codUsuario){
+            $query->where('codigo',$codUsuario);
+        })->get();
+        return response()->json($dispositivos, 200);
     }
 
     /**
@@ -49,6 +39,10 @@ class DispositivoController extends Controller
         $this->validate($request, Dispositivo::$rules);
         
         $datos = $request->all();
+        
+        $fechaHoy = new \DateTime();
+        $tiempoCambioFiltro = config('parametros.config.tiempo_cambio_filtro');
+        $datos['fecha_cambio_filtro'] = $fechaHoy->add(new \DateInterval("P{$tiempoCambioFiltro}M"));
         
         $dispositivo = Dispositivo::firstOrCreate(['codigo' => $datos['codigo']],$datos);
         
@@ -61,7 +55,7 @@ class DispositivoController extends Controller
     
     public function get(Request $request, $id){
         $dispositivo = Dispositivo::where('id',$id)->with(['cultivos' => function ($query){
-            $query->where('estado', \App\Cultivo::ACTIVO);
+                $query->where('estado', '!=', \App\Cultivo::INACTIVO);
         }])->first();
         return response()->json($dispositivo, 200);
     }

@@ -3,7 +3,7 @@
 namespace App;
 
 use App\BaseModel;
-use Illuminate\Support\Carbon;
+use App\TipoNotificacion;
 
 class Dispositivo extends BaseModel
 {
@@ -32,6 +32,7 @@ class Dispositivo extends BaseModel
         'notificaciones_on', 
         'luz_on', 
         'vaciar',
+        'fecha_cambio_filtro',
         'estado'
     ];
 
@@ -46,7 +47,7 @@ class Dispositivo extends BaseModel
         'estado' => self::OFF,
     ];
     
-    protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado'];
+    protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado', 'fecha_cambio_filtro'];
 
     public static $rules = [
         'codigo' => 'required',
@@ -66,10 +67,6 @@ class Dispositivo extends BaseModel
     public function cultivoActual()
     {
         return $this->hasMany('App\Cultivo')->where('estado', parent::ACTIVO)->first();
-    }
-    
-    public function usuario(){
-        return $this->hasMany('App\UsuarioDispositivo');
     }
     
     public function usuarios(){
@@ -92,25 +89,34 @@ class Dispositivo extends BaseModel
         $interval = $fechaVaciado->diff(new \DateTime());
         $transcurrido = $interval->format('%a');
         
-        if($this->vaciar == 1 || $transcurrido >= config('config.vaciado.dias') ){
+        if($this->vaciar == 1 || $transcurrido >= config('parametros.config.dias_vaciado') ){
             $this->fecha_vaciado = new \DateTime();
+            $this->vaciar = 0;
             $this->save();
-            //TODO: Mandar notificación de que empieza vaciado.
+            $tipoNotificacion = TipoNotificacion::where([
+                'tipo' => TipoNotificacion::INFO,
+                'pos_string' => TipoNotificacion::VACIADO
+            ])->firstOrFail();
+            $notificacion = new Notificacion();
+            $notificacion->tipoNotificacion()->associate($tipoNotificacion);
+            $this->notificaciones()->save($notificacion);
             return 1;
         }
         return 0;
     }
     
     public static function setDesconexiones(){
-        $minDesconexion = config('config.notificacion.desconexion');
+        $minDesconexion = config('parametros.config.tiempo_desconexion');
         $fecha = new \DateTime();
-        $fecha->sub(new \DateInterval("P{$minDesconexion}I")); 
+        $fecha->sub(new \DateInterval("PT{$minDesconexion}M")); 
         
-        $dispositivos = Dispositivo::hasWith(['App\Medicion' => function ($query) use ($fecha){
-            $query->selectRaw('max(fecha) as ult_fecha')->where('ult_fecha' <= $fecha->format('Y-m-d H:i:s'));
-        }])->update(['estado' => Dispositivo::SIN_CONEXION]);
+        $dispositivos = Dispositivo::where('estado', Dispositivo::ON)->whereHas('cultivos.mediciones', function ($query) use ($fecha){
+            $query->selectRaw('max(fecha) as ult_fecha')->groupBy('cultivo_id')->having('ult_fecha', '<=' ,$fecha->format('Y-m-d H:i:s'));
+        });
+        $dispositivos->update(['estado' => Dispositivo::SIN_CONEXION]);
         
-        return $dispositivos;
+        return $dispositivos->get();
     }
     
+    //TODO: Fecha de cambio de filtro
 }

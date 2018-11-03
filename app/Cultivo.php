@@ -132,6 +132,7 @@ class Cultivo extends BaseModel
             ])->firstOrFail();
             $notificacion = new Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
+            $notificacion->cultivo()->associate($this);
             $this->dispositivo->notificaciones()->save($notificacion);
         }
         return $fase;

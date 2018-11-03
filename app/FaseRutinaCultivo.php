@@ -48,4 +48,12 @@ class FaseRutinaCultivo extends Model
         return $this->hasMany('App\ParametroFaseCultivo');
     }
     
+    public function esFinal(){
+        $orden = $this->fase->orden;
+        $fases = self::whereHas('fase',function($query) use ($orden){
+            $query->where('orden','>', $orden);
+        });
+        return (empty($fases));
+    }
+    
 }
