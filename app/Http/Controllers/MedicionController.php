@@ -25,11 +25,13 @@ class MedicionController extends Controller
      * @param Request $request
      */
     public function get(Request $request, $id){
-        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id')->with([
+        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id','fase_rutina_cultivo_id')->with([
             'parametro' => function ($query){
                 $query->select('id','nombre');
             },
-            'fasesRutinaCultivo.parametrosFaseCultivo'
+            'faseRutinaCultivo.parametrosFaseCultivo' => function($query){
+                $query->select('fase_rutina_cultivo_id','valor_esperado');
+            }
         ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
         
         return response()->json(['mediciones' => $mediciones->keyBy('parametro.nombre')->all()],200);
