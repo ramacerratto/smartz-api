@@ -4,6 +4,7 @@ namespace App;
 
 use App\BaseModel;
 use App\TipoNotificacion;
+use Carbon\Carbon;
 
 class Dispositivo extends BaseModel
 {
@@ -47,6 +48,15 @@ class Dispositivo extends BaseModel
         'estado' => self::OFF,
     ];
     
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+       'fecha_cambio_filtro' => 'date:d/m/Y',
+    ];
+   
     protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado', 'fecha_cambio_filtro'];
 
     public static $rules = [
@@ -55,6 +65,10 @@ class Dispositivo extends BaseModel
         'hora_inicio' => 'date_format:"H"',
         'usuario_id' => 'required|alpha_num'
     ];
+    
+    public function setFechaCambioFiltroAttribute($value){
+        $this->attributes['fecha_cambio_filtro'] = Carbon::createFromFormat("d/m/Y", $value );
+    }
 
     /**
      * Obtiene los cultivos para el dispositivo.
@@ -118,5 +132,4 @@ class Dispositivo extends BaseModel
         return $dispositivos->get();
     }
     
-    //TODO: Fecha de cambio de filtro
 }

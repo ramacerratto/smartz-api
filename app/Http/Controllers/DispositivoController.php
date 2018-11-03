@@ -64,6 +64,7 @@ class DispositivoController extends Controller
         $this->validate($request, [
             'hora_inicio' => 'date_format:H',
             'notificaciones_on' => 'boolean',
+            'fecha_cambio_filtro' => 'date_format:"d/m/Y"',
             'luz_on' => 'boolean',
             'vaciar' => 'boolean'
         ]);
