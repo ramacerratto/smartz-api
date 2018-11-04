@@ -3,6 +3,8 @@
 namespace App;
 
 use App\BaseModel;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionMailer;
 
 class Cultivo extends BaseModel
 {
@@ -134,6 +136,7 @@ class Cultivo extends BaseModel
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $notificacion->cultivo()->associate($this);
             $this->dispositivo->notificaciones()->save($notificacion);
+            Mail::to($this->dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
         }
         return $fase;
     }

@@ -19,7 +19,7 @@ class Usuario extends BaseModel
      *
      * @var array
      */
-    protected $fillable = ['codigo', 'device_token'];
+    protected $fillable = ['codigo', 'device_token', 'email'];
 
     /**
      * The attributes excluded from the model's JSON form.

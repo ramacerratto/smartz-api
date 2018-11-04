@@ -5,6 +5,8 @@ namespace App;
 use App\BaseModel;
 use App\TipoNotificacion;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionMailer;
 
 class Dispositivo extends BaseModel
 {
@@ -91,6 +93,11 @@ class Dispositivo extends BaseModel
         return $this->hasMany('App\Notificacion')->orderBy('fecha_alta','DESC');
     }
     
+    public function getEmails(){
+        //var_dump($this->with('usuarios:id,email')->get());
+        return Usuario::whereHas('dispositivos')->whereNotNull('email')->pluck('email')->toArray();
+    }
+    
     /**
      * Devuelve la condicion de vaciado segun dias transcurridos o 
      * directiva desde la App.
@@ -114,6 +121,7 @@ class Dispositivo extends BaseModel
             $notificacion = new Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $this->notificaciones()->save($notificacion);
+            Mail::to($this->getEmails())->send(new NotificacionMailer($notificacion));
             return 1;
         }
         return 0;
@@ -131,5 +139,4 @@ class Dispositivo extends BaseModel
         
         return $dispositivos->get();
     }
-    
 }

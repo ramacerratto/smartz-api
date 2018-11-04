@@ -86,6 +86,7 @@ $app->middleware([
 $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(App\Providers\NotificacionServiceProvider::class);
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -104,6 +105,9 @@ $app->router->group([
     require __DIR__.'/../routes/web.php';
 });
 
+//Archivos de configuración
 $app->configure('parametros');
+$app->configure('mail');
+$app->configure('services');
 
 return $app;

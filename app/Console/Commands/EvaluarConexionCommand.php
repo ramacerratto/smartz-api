@@ -3,6 +3,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Servicios\Notificaciones;
+use Illuminate\Support\Facades\Mail;
 
 
 /**
@@ -62,7 +63,7 @@ class EvaluarConexionCommand extends Command
             $notificacion = new \App\Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $dispositivo->notificaciones()->save($notificacion);
-            //$this->notificaciones->enviar($notificacion);
+            Mail::to($dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
         }
     }
 }

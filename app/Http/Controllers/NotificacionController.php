@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\TipoNotificacion;
 use App\Notificacion;
 use App\Servicios\Notificaciones;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionMailer;
 
 class NotificacionController extends Controller
 {
@@ -18,13 +20,16 @@ class NotificacionController extends Controller
     protected $notificaciones;
     
     public function __construct() {
-        
-        //$this->notificaciones = $notificaciones;
     }
     
-    public function get(Request $request, $id){
-        $dispositivo = \App\Dispositivo::with('notificaciones.tipoNotificacion')->findOrFail($id);
-        return response()->json(['notificaciones' => $dispositivo->notificaciones->take(10)],200);
+    public function get(Request $request, $id, $enviadas){
+        $estado = ($enviadas)?Notificacion::ENVIADA:Notificacion::PENDIENTE; 
+        $notificaciones = Notificacion::where('estado', $estado)->whereHas('dispositivo', function($query) use ($id){
+            $query->where('id', $id);
+        });
+        $result = $notificaciones->get();
+        $notificaciones->update(['estado' => Notificacion::ENVIADA]);
+        return response()->json(['notificaciones' => $result->take(10)],200);
     }
     
     /**
@@ -53,8 +58,8 @@ class NotificacionController extends Controller
                     $notificacion = new Notificacion();
                     $notificacion->tipoNotificacion()->associate($tipoNotificacion);
                     $dispositivo->notificaciones()->save($notificacion);
-                    
-                    //$this->notificaciones->enviar($notificacion);
+                    //var_dump($dispositivo->getEmails()); die();
+                    Mail::to($dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
                 }
             }
         }

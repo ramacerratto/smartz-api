@@ -39,7 +39,7 @@ $router->put( 'dispositivos/trigger/{id}', 'DispositivoController@trigger');
 $router->put( 'dispositivos/vaciar/{id}',  'DispositivoController@vaciar');
 
 //Notificaciones
-$router->get( 'notificaciones/get/{id}', 'NotificacionController@get');
+$router->get( 'notificaciones/get/{id}/{enviadas}', 'NotificacionController@get');
 
 //Comunicacion Arduino
 $router->post('comunicacionArduino', function(Request $request) use ($router) {
