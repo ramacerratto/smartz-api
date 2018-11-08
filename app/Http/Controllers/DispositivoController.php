@@ -16,7 +16,7 @@ class DispositivoController extends Controller
     {
         //
     }
-    
+
     /**
      * Obtiene los dispositivos de un usuario
      * 
@@ -24,8 +24,10 @@ class DispositivoController extends Controller
      * @param int $idUsuario
      * @return array
      */
-    public function index(Request $request, $idUsuario){
-        $dispositivos = \App\UsuarioDispositivo::findDispositivos($idUsuario);
+    public function index(Request $request, $codUsuario){
+        $dispositivos = Dispositivo::whereHas('usuarios', function($query) use ($codUsuario){
+            $query->where('codigo',$codUsuario);
+        })->get();
         return response()->json($dispositivos, 200);
     }
 
@@ -38,21 +40,22 @@ class DispositivoController extends Controller
         
         $datos = $request->all();
         
-        $dispositivo = new Dispositivo($datos);
+        $fechaHoy = new \DateTime();
+        $tiempoCambioFiltro = config('parametros.config.tiempo_cambio_filtro');
+        $datos['fecha_cambio_filtro'] = $fechaHoy->add(new \DateInterval("P{$tiempoCambioFiltro}M"));
         
-        $dispositivo->save();
+        $dispositivo = Dispositivo::firstOrCreate(['codigo' => $datos['codigo']],$datos);
         
-        $usuarioDispositivo = new \App\UsuarioDispositivo();
-        $usuarioDispositivo->usuario_id = $datos['usuario_id'];
-        $usuarioDispositivo->dispositivo()->associate($dispositivo);
-        $usuarioDispositivo->save();
+        $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']]);
+        
+        $usuario->dispositivos()->syncWithoutDetaching($dispositivo);
 
         return response()->json($dispositivo, 201);
     }
     
     public function get(Request $request, $id){
         $dispositivo = Dispositivo::where('id',$id)->with(['cultivos' => function ($query){
-            $query->where('estado', \App\Cultivo::ACTIVO);
+                $query->where('estado', '!=', \App\Cultivo::INACTIVO);
         }])->first();
         return response()->json($dispositivo, 200);
     }
@@ -61,6 +64,7 @@ class DispositivoController extends Controller
         $this->validate($request, [
             'hora_inicio' => 'date_format:H',
             'notificaciones_on' => 'boolean',
+            'fecha_cambio_filtro' => 'date_format:"d/m/Y"',
             'luz_on' => 'boolean',
             'vaciar' => 'boolean'
         ]);

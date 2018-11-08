@@ -3,11 +3,15 @@
 namespace App;
 
 use App\BaseModel;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionMailer;
 
 class Cultivo extends BaseModel
 {
 
     const CREATED_AT = 'fecha_inicio';
+    
+    const COSECHABLE = 2;
     
     /**
      * The table associated with the model.
@@ -73,7 +77,7 @@ class Cultivo extends BaseModel
     public function getDiasTotalesAttribute(){
         $fechaInicio = new \DateTime($this->fecha_inicio);
         $interval = $fechaInicio->diff(new \DateTime($this->fecha_fin));
-        return $interval->format('%a');
+        return $interval->format('%a')+1;
     }
     
     public function getNombreRutinaCultivoAttribute(){
@@ -97,6 +101,13 @@ class Cultivo extends BaseModel
     }
     
     /**
+     * Obtiene el dispositivo del cultivo
+     */
+    public function dispositivo(){
+        return $this->belongsTo('App\Dispositivo');
+    }
+    
+    /**
      * Devuelve la fase actual o false si el ciclo ya termino
      * 
      * @return boolean
@@ -114,6 +125,18 @@ class Cultivo extends BaseModel
             if($transcurrido <= 0){
                 break;
             }
+        }
+        if($transcurrido == 0){
+            $posString = ($fase->esFinal())?TipoNotificacion::COSECHA:TipoNotificacion::CAMBIOFASE;
+            $tipoNotificacion = TipoNotificacion::where([
+                'tipo' => TipoNotificacion::INFO,
+                'pos_string' => $posString
+            ])->firstOrFail();
+            $notificacion = new Notificacion();
+            $notificacion->tipoNotificacion()->associate($tipoNotificacion);
+            $notificacion->cultivo()->associate($this);
+            $this->dispositivo->notificaciones()->save($notificacion);
+            Mail::to($this->dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
         }
         return $fase;
     }

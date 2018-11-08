@@ -43,4 +43,12 @@ class Notificacion extends Model
         return $this->belongsTo('App\TipoNotificacion');
     }
     
+    public function cultivo(){
+        return $this->belongsTo('App\Cultivo');
+    }
+    
+    public function dispositivo(){
+        return $this->belongsTo('App\Dispositivo');
+    }
+    
 }

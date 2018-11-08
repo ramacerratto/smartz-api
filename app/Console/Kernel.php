@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\EvaluarConexionCommand::class
     ];
 
     /**
@@ -24,6 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $m = config('config.notificacion.desconexion');
+        $schedule->command('conexion:evaluar')->cron("*/$m * * * *");
     }
 }

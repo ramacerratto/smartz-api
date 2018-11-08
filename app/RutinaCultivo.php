@@ -17,7 +17,7 @@ class RutinaCultivo extends BaseModel
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = ['nombre', 'descripcion'];
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -33,13 +33,24 @@ class RutinaCultivo extends BaseModel
      */
     protected $appends = ['dias_totales'];
     
+    protected $attributes = [
+        'estado' => parent::ACTIVO,
+    ];
+    
     public static $rules = [
-            // Validation rules
+        'nombre' => 'required|alpha',
+        'descripcion' => 'required',
+        'codigo_usuario' => 'required'
     ];
     
     public function fasesRutinaCultivo()
     {
-        return $this->hasMany('App\FaseRutinaCultivo');
+        return $this->hasMany('App\FaseRutinaCultivo', 'rutina_cultivo_id');
+    }
+    
+    public function usuario()
+    {
+        return $this->belongsTo('App\Usuario', 'usuario_id');
     }
     
     public function getDiasTotalesAttribute(){

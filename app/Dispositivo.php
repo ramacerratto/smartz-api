@@ -3,6 +3,10 @@
 namespace App;
 
 use App\BaseModel;
+use App\TipoNotificacion;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotificacionMailer;
 
 class Dispositivo extends BaseModel
 {
@@ -31,6 +35,7 @@ class Dispositivo extends BaseModel
         'notificaciones_on', 
         'luz_on', 
         'vaciar',
+        'fecha_cambio_filtro',
         'estado'
     ];
 
@@ -45,14 +50,27 @@ class Dispositivo extends BaseModel
         'estado' => self::OFF,
     ];
     
-    protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado'];
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+       'fecha_cambio_filtro' => 'date:d/m/Y',
+    ];
+   
+    protected $dates = ['fecha_alta', 'fecha_modificacion', 'fecha_baja', 'fecha_vaciado', 'fecha_cambio_filtro'];
 
     public static $rules = [
-        'codigo' => 'required|unique:dispositivos',
+        'codigo' => 'required',
         'descripcion' => 'required|alpha_dash|max:255',
         'hora_inicio' => 'date_format:"H"',
         'usuario_id' => 'required|alpha_num'
     ];
+    
+    public function setFechaCambioFiltroAttribute($value){
+        $this->attributes['fecha_cambio_filtro'] = Carbon::createFromFormat("d/m/Y", $value );
+    }
 
     /**
      * Obtiene los cultivos para el dispositivo.
@@ -67,12 +85,17 @@ class Dispositivo extends BaseModel
         return $this->hasMany('App\Cultivo')->where('estado', parent::ACTIVO)->first();
     }
     
-    public function usuario(){
-        return $this->hasMany('App\UsuarioDispositivo');
+    public function usuarios(){
+        return $this->belongsToMany('App\Usuario', 'usuarios_dispositivos');
     }
     
     public function notificaciones(){
         return $this->hasMany('App\Notificacion')->orderBy('fecha_alta','DESC');
+    }
+    
+    public function getEmails(){
+        //var_dump($this->with('usuarios:id,email')->get());
+        return Usuario::whereHas('dispositivos')->whereNotNull('email')->pluck('email')->toArray();
     }
     
     /**
@@ -87,13 +110,33 @@ class Dispositivo extends BaseModel
         $interval = $fechaVaciado->diff(new \DateTime());
         $transcurrido = $interval->format('%a');
         
-        if($this->vaciar == 1 || $transcurrido >= config('app.vaciado.dias') ){
+        if($this->vaciar == 1 || $transcurrido >= config('parametros.config.dias_vaciado') ){
             $this->fecha_vaciado = new \DateTime();
+            $this->vaciar = 0;
             $this->save();
-            //TODO: Mandar notificación de que empieza vaciado.
+            $tipoNotificacion = TipoNotificacion::where([
+                'tipo' => TipoNotificacion::INFO,
+                'pos_string' => TipoNotificacion::VACIADO
+            ])->firstOrFail();
+            $notificacion = new Notificacion();
+            $notificacion->tipoNotificacion()->associate($tipoNotificacion);
+            $this->notificaciones()->save($notificacion);
+            Mail::to($this->getEmails())->send(new NotificacionMailer($notificacion));
             return 1;
         }
         return 0;
     }
     
+    public static function setDesconexiones(){
+        $minDesconexion = config('parametros.config.tiempo_desconexion');
+        $fecha = new \DateTime();
+        $fecha->sub(new \DateInterval("PT{$minDesconexion}M")); 
+        
+        $dispositivos = Dispositivo::where('estado', Dispositivo::ON)->whereHas('cultivos.mediciones', function ($query) use ($fecha){
+            $query->selectRaw('max(fecha) as ult_fecha')->groupBy('cultivo_id')->having('ult_fecha', '<=' ,$fecha->format('Y-m-d H:i:s'));
+        });
+        $dispositivos->update(['estado' => Dispositivo::SIN_CONEXION]);
+        
+        return $dispositivos->get();
+    }
 }

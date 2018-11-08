@@ -25,9 +25,12 @@ class MedicionController extends Controller
      * @param Request $request
      */
     public function get(Request $request, $id){
-        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id')->with([
+        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id','fase_rutina_cultivo_id')->with([
             'parametro' => function ($query){
                 $query->select('id','nombre');
+            },
+            'faseRutinaCultivo.parametrosFaseCultivo' => function($query){
+                $query->select('fase_rutina_cultivo_id','valor_esperado');
             }
         ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
         
@@ -54,8 +57,11 @@ class MedicionController extends Controller
         $respuesta['id'] = $datos['chipID'];
         $respuesta['HorasLuz'] = $faseCultivo->horas_luz;
         $respuesta['HoraInicioLuz'] = $dispositivo->hora_inicio;
-        $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON)?1:0; //Envía estado del dispositivo (ON/OFF)
+        $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON || $dispositivo->estado == Dispositivo::SIN_CONEXION)?1:0; //Envía estado del dispositivo (ON/OFF)
         $respuesta['Vaciado'] = $dispositivo->vaciar();
+        
+        $dispositivo->estado = $respuesta['Power'];
+        $dispositivo->save();
         
         foreach($datos as $key => $dato){
             $parametro = Parametro::whereDescripcion($key)->get()->first();
@@ -74,15 +80,33 @@ class MedicionController extends Controller
             }
         }
         
-        //TODO: Pasar cultivo "en cosecha"
-        
         return response()->json($respuesta, 200);
     }
     
-    public function reporte(Request $request,$idCultivo,$idParametro){
-        //TODO: REPORTE DE LINEA
+    /**
+     * Reporte lineal de mediciones en el tiempo
+     * 
+     * @param Request $request
+     * @param int $idCultivo
+     * @param int $idParametro
+     * @return array [labels, valores]
+     */
+    public function reporte(Request $request,$idCultivo,$idParametro,$tiempo = null){
+        $tiempo = ($tiempo)?$tiempo:1;
+        $hoy = new \DateTime();
+        $fechaLimite = $hoy->sub(new \DateInterval("P{$tiempo}W"))->format('Y-m-d H:i:s');
+        $mediciones = Medicion::where(['cultivo_id' => $idCultivo, 'parametro_id' => $idParametro,['fecha','>=',$fechaLimite] ])
+                ->select('fecha','valor')
+                ->selectRaw('dayofyear(fecha) Day, date_format(fecha,"%d/%m/%Y") as fecha_sh')
+                ->groupBy('Day')
+                ->orderBy('fecha','desc')
+                ->get();
         
-        
+        $result = [
+            $mediciones->pluck('fecha_sh'),
+            $mediciones->pluck('valor'),
+        ];
+        return $result;
     }
     
     public function test(){
