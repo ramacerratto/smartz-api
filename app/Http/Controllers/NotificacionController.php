@@ -26,7 +26,7 @@ class NotificacionController extends Controller
         $estado = ($enviadas)?Notificacion::ENVIADA:Notificacion::PENDIENTE; 
         $notificaciones = Notificacion::where('estado', $estado)->whereHas('dispositivo', function($query) use ($id){
             $query->where('id', $id);
-        });
+        })->with('tipoNotificacion');
         $result = $notificaciones->get();
         $notificaciones->update(['estado' => Notificacion::ENVIADA]);
         return response()->json(['notificaciones' => $result->take(10)],200);
