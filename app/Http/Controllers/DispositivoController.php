@@ -42,11 +42,11 @@ class DispositivoController extends Controller
         
         $fechaHoy = new \DateTime();
         $tiempoCambioFiltro = config('parametros.config.tiempo_cambio_filtro');
-        $datos['fecha_cambio_filtro'] = $fechaHoy->add(new \DateInterval("P{$tiempoCambioFiltro}M"));
+        $datos['fecha_cambio_filtro'] = $fechaHoy->add(new \DateInterval("P{$tiempoCambioFiltro}M"))->format('d/m/Y');
         
         $dispositivo = Dispositivo::firstOrCreate(['codigo' => $datos['codigo']],$datos);
         
-        $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']]);
+        $usuario = \App\Usuario::firstOrCreate(['codigo' => $datos['usuario_id']],$datos);
         
         $usuario->dispositivos()->syncWithoutDetaching($dispositivo);
 

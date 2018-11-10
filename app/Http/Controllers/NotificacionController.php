@@ -37,16 +37,15 @@ class NotificacionController extends Controller
      * @param Request $request
      */
     public function registrar(Request $request){
-        $this->validate($request, [
-            'Alertas' => 'required|string', 
-            'Errores' => 'required|string'
-        ]);
+        $this->validate($request, Notificacion::$rules);
+        
+        $datos = json_decode($request->input('dato'), true);
         
         //Obtengo datos maestros
-        $dispositivo = \App\Dispositivo::where(['codigo' => $request->input('chipID')])->firstOrFail();
+        $dispositivo = \App\Dispositivo::where(['codigo' => $datos['chipID']])->firstOrFail();
         $tipos = [
-            TipoNotificacion::ALERTA => $request->input('Alertas'),
-            TipoNotificacion::ERROR => $request->input('Errores')
+            TipoNotificacion::ALERTA => $datos['Alertas'],
+            TipoNotificacion::ERROR => $datos['Errores']
         ];
         foreach ($tipos as $tipo => $string) {
             for($i=0; $i < strlen($string); $i++){
@@ -58,7 +57,6 @@ class NotificacionController extends Controller
                     $notificacion = new Notificacion();
                     $notificacion->tipoNotificacion()->associate($tipoNotificacion);
                     $dispositivo->notificaciones()->save($notificacion);
-                    //var_dump($dispositivo->getEmails()); die();
                     Mail::to($dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
                 }
             }

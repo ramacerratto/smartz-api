@@ -21,7 +21,7 @@ class RutinaCultivoController extends Controller
      * @param Request $request
      */
     public function crear(Request $request){
-        //$this->validate($request, RutinaCultivo::$rules);
+        $this->validate($request, RutinaCultivo::$rules);
         
         $datos = $request->all();
         
@@ -34,7 +34,6 @@ class RutinaCultivoController extends Controller
         $usuario->rutinasCultivo()->save($rutinaCultivo);
         
         foreach ($datosRutina['fasesRutinaCultivo'] as $datosFaseRutinaCultivo){
-            //TODO: Faltan validaciones $this->validate($request, \App\FaseRutinaCultivo::$rules);
             //Creo las fasesRutinaCultivo
             $faseRutinaCultivo = $rutinaCultivo->fasesRutinaCultivo()->create($datosFaseRutinaCultivo);
             

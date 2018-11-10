@@ -39,6 +39,11 @@ class Notificacion extends Model
         'estado' => self::PENDIENTE
     ];
     
+    public static $rules = [
+        'dato.*.Alertas' => 'required|string|8', 
+        'dato.*.Errores' => 'required|string|size:12'
+    ];
+    
     public function tipoNotificacion(){
         return $this->belongsTo('App\TipoNotificacion');
     }
