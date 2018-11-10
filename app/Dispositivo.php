@@ -65,7 +65,8 @@ class Dispositivo extends BaseModel
         'codigo' => 'required',
         'descripcion' => 'required|alpha_dash|max:255',
         'hora_inicio' => 'date_format:"H"',
-        'usuario_id' => 'required|alpha_num'
+        'usuario_id' => 'required|alpha_num',
+        'email' => 'required|email'
     ];
     
     public function setFechaCambioFiltroAttribute($value){

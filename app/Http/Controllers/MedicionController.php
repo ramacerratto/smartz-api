@@ -25,16 +25,17 @@ class MedicionController extends Controller
      * @param Request $request
      */
     public function get(Request $request, $id){
-        $mediciones = Medicion::where('cultivo_id',$id)->select('valor','fecha','parametro_id','fase_rutina_cultivo_id')->with([
-            'parametro' => function ($query){
-                $query->select('id','nombre');
-            },
-            'faseRutinaCultivo.parametrosFaseCultivo' => function($query){
-                $query->select('fase_rutina_cultivo_id','valor_esperado');
-            }
-        ])->raw('MAX(fecha) as fecha')->groupBy('parametro_id')->get();
-        
-        return response()->json(['mediciones' => $mediciones->keyBy('parametro.nombre')->all()],200);
+        $mediciones = Medicion::where('cultivo_id',$id)->where('fecha', function($query) use ($id){
+                $query->selectRaw('MAX(fecha) as fecha')->from('mediciones')->where('cultivo_id',$id)->first();
+            })->with([
+                'parametro' => function ($query){
+                    $query->select('id','nombre');
+                },
+                'faseRutinaCultivo.parametrosFaseCultivo' => function($query){
+                    $query->select('fase_rutina_cultivo_id','valor_esperado');
+                }
+        ])->groupBy('parametro_id')->get();
+        return response()->json(['mediciones' => $mediciones->all()],200);
     }
     
     /**
@@ -79,7 +80,6 @@ class MedicionController extends Controller
                 }
             }
         }
-        
         return response()->json($respuesta, 200);
     }
     
