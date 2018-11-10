@@ -42,7 +42,7 @@ $router->put( 'dispositivos/vaciar/{id}',  'DispositivoController@vaciar');
 $router->get( 'notificaciones/get/{id}/{enviadas}', 'NotificacionController@get');
 
 //Comunicacion Arduino
-$router->post('comunicacionArduino', function(Request $request) use ($router) {
+$router->get('comunicacionArduino', function(Request $request) use ($router) {
     $this->validate($request, [
         'dato.*.chipID' => 'required|alpha_num'
     ]);

@@ -63,6 +63,10 @@ $app->middleware([
     App\Http\Middleware\CorsMiddleware::class
 ]);
 
+$app->middleware([
+    Spatie\HttpLogger\Middlewares\HttpLogger::class
+]);
+
 // $app->middleware([
 //    App\Http\Middleware\ExampleMiddleware::class
 // ]);
@@ -87,6 +91,7 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 $app->register(App\Providers\NotificacionServiceProvider::class);
 $app->register(Illuminate\Mail\MailServiceProvider::class);
+$app->register(Spatie\HttpLogger\HttpLoggerServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -109,5 +114,7 @@ $app->router->group([
 $app->configure('parametros');
 $app->configure('mail');
 $app->configure('services');
+$app->configure('http-logger');
+
 
 return $app;
