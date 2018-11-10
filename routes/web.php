@@ -44,7 +44,7 @@ $router->get( 'notificaciones/get/{id}/{enviadas}', 'NotificacionController@get'
 //Comunicacion Arduino
 $router->post('comunicacionArduino', function(Request $request) use ($router) {
     $this->validate($request, [
-        'chipID' => 'required|alpha_num'
+        'dato.*.chipID' => 'required|alpha_num'
     ]);
     
     (new NotificacionController)->registrar($request);

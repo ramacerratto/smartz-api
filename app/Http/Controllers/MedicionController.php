@@ -44,7 +44,7 @@ class MedicionController extends Controller
      */
     public function registrar(Request $request){
         
-        $datos = $request->all();
+        $datos = json_decode($request->input('dato'), true);
         $respuesta = [];
         
         //Obtengo datos maestros

@@ -38,9 +38,9 @@ class RutinaCultivo extends BaseModel
     ];
     
     public static $rules = [
-        'nombre' => 'required|alpha',
-        'descripcion' => 'required',
-        'codigo_usuario' => 'required'
+        'rutina_cultivo.*.nombre' => 'required|alpha',
+        'rutina_cultivo.*.descripcion' => 'required',
+        'codigo_usuario' => 'required',
     ];
     
     public function fasesRutinaCultivo()
