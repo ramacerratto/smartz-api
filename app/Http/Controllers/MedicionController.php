@@ -35,7 +35,7 @@ class MedicionController extends Controller
                     $query->select('fase_rutina_cultivo_id','valor_esperado');
                 }
         ])->groupBy('parametro_id')->get();
-        return response()->json(['mediciones' => $mediciones->all()],200);
+        return response()->json(['mediciones' => $mediciones->keyBy('parametro.nombre')->all()],200);
     }
     
     /**
