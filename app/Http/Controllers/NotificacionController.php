@@ -23,14 +23,16 @@ class NotificacionController extends Controller
     }
     
     public function get(Request $request, $id, $enviadas){
-        $estado = ($enviadas)?Notificacion::ENVIADA:Notificacion::PENDIENTE; 
-        $notificaciones = Notificacion::where('estado', $estado)->whereHas('dispositivo', function($query) use ($id){
-            $query->where([
-                'id' => $id, 
-                'notificaciones_on' => 1
-            ]);
+        $condiciones = ['id' => $id];
+        $estado = Notificacion::ENVIADA;
+        if(!$enviadas){
+            $condiciones['notificaciones_on'] = 1;
+            $estado = Notificacion::PENDIENTE;
+        }
+        $notificaciones = Notificacion::where('estado', $estado)->whereHas('dispositivo', function($query) use ($id, $condiciones) {
+            $query->where($condiciones);
         })->with('tipoNotificacion');
-        $result = $notificaciones->get();
+        $result = $notificaciones->orderBy('fecha_alta', 'desc')->get();
         $notificaciones->update(['estado' => Notificacion::ENVIADA]);
         return response()->json(['notificaciones' => $result->take(10)],200);
     }
