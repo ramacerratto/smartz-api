@@ -56,7 +56,7 @@ class MedicionController extends Controller
         
         //Armo array de respuesta:
         $respuesta['id'] = $datos['chipID'];
-        $respuesta['HorasLuz'] = $faseCultivo->horas_luz;
+        $respuesta['HorasLuz'] = ($dispositivo->luz_on)?$faseCultivo->horas_luz:0;
         $respuesta['HoraInicioLuz'] = $dispositivo->hora_inicio;
         $respuesta['Power'] = ($dispositivo->estado == Dispositivo::ON || $dispositivo->estado == Dispositivo::SIN_CONEXION)?1:0; //Envía estado del dispositivo (ON/OFF)
         $respuesta['Vaciado'] = $dispositivo->vaciar();
