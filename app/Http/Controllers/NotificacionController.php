@@ -62,7 +62,7 @@ class NotificacionController extends Controller
                     $notificacion = new Notificacion();
                     $notificacion->tipoNotificacion()->associate($tipoNotificacion);
                     $dispositivo->notificaciones()->save($notificacion);
-                    Mail::to($dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
+                    //Mail::to($dispositivo->getEmails())->send(new NotificacionMailer($notificacion));
                 }
             }
         }

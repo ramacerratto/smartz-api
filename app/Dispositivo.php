@@ -106,15 +106,17 @@ class Dispositivo extends BaseModel
      * 
      * @return int
      */
-    public function vaciar(){
+    public function vaciar($nivelTanquePpal){
         $fechaVaciado = new \DateTime($this->fecha_vaciado);
         $interval = $fechaVaciado->diff(new \DateTime());
         $transcurrido = $interval->format('%a');
         
         if($this->vaciar == 1 || $transcurrido >= config('parametros.config.dias_vaciado') ){
-            $this->fecha_vaciado = new \DateTime();
-            $this->vaciar = 0;
-            $this->save();
+            if($nivelTanquePpal < 20){              
+                $this->fecha_vaciado = new \DateTime();
+                $this->vaciar = 0;
+                $this->save();
+            }
             $tipoNotificacion = TipoNotificacion::where([
                 'tipo' => TipoNotificacion::INFO,
                 'pos_string' => TipoNotificacion::VACIADO
@@ -122,7 +124,7 @@ class Dispositivo extends BaseModel
             $notificacion = new Notificacion();
             $notificacion->tipoNotificacion()->associate($tipoNotificacion);
             $this->notificaciones()->save($notificacion);
-            Mail::to($this->getEmails())->send(new NotificacionMailer($notificacion));
+            //Mail::to($this->getEmails())->send(new NotificacionMailer($notificacion));
             return 1;
         }
         return 0;
